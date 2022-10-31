@@ -6,7 +6,9 @@ namespace FileObserverTask1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var fileSystemVisitor = new FileSystemVisitor();
+            fileSystemVisitor.Visit();
+            Console.ReadLine();
         }
     }
 }
