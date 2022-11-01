@@ -7,17 +7,54 @@ namespace FileObserverTask1
 {
     public class FileSystemVisitor
     {
-        private const string Path = "C:\\Users\\Ivan\\Downloads\\TestFolder";
+        private readonly string _path;
+        public delegate bool Filter(string value);
+        private readonly Filter _filter;
+
+        public FileSystemVisitor(string path)
+        {
+            _path = path;
+        }
+
+        public FileSystemVisitor(string path, Filter filter)
+        {
+            _path = path;
+            _filter = filter;
+        }
 
         public void Visit()
         {
-            Console.WriteLine($"Search in {Path}{Environment.NewLine}");
+            Console.WriteLine($"Search in {_path}{Environment.NewLine}");
 
-            var result = ProcessPath(Path);
-
-            foreach (var item in result)
+            foreach (var item in ProcessPath(_path))
             {
                 Console.WriteLine(item);
+            }
+        }
+
+        IEnumerable<string> ProcessPath(string directory, string tab = "")
+        {
+            foreach (var file in Directory.GetFiles(directory))
+            {
+                var fileName = GetName(file);
+
+                if (GetFilteredResult(fileName))
+                {
+                    yield return $"{tab}{fileName}";
+                }
+            }
+
+            foreach (var path in Directory.GetDirectories(directory))
+            {
+                if (GetFilteredResult(GetName(path)))
+                {
+                    yield return $"{tab}{GetName(path)}";
+                }
+
+                foreach (var file in ProcessPath(path, tab + "\t"))
+                {
+                    yield return file;
+                }
             }
         }
 
@@ -27,23 +64,14 @@ namespace FileObserverTask1
             return splitPath.Last();
         }
 
-        IEnumerable<string> ProcessPath(string directory, string tab = "")
+        bool GetFilteredResult(string value)
         {
+            if (_filter != null && _filter(value))
+                return true;
 
-            foreach (var file in Directory.GetFiles(directory))
-            {
-                yield return ($"{tab}File: {GetName(file)}");
-            }
+            if (_filter == null) return true;
 
-            foreach (var path in Directory.GetDirectories(directory))
-            {
-                yield return $"{tab}{GetName(path)}";
-
-                foreach (var file in ProcessPath(path, tab + " "))
-                {
-                    yield return file;
-                }
-            }
+            return false;
         }
     }
 }
