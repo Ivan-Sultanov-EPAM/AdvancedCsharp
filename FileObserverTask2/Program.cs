@@ -13,11 +13,11 @@ namespace FileObserverTask2
         {
             do
             {
-                Console.WriteLine($"Please enter the path, or press enter to search in Downloads folder:{NewLine}");
-                var path = Console.ReadLine();
+                System.Console.WriteLine($"Please enter the path, or press enter to search in Downloads folder:{NewLine}");
+                var path = System.Console.ReadLine();
 
-                Console.WriteLine($"Please enter the filtering string:{NewLine}");
-                var filter = Console.ReadLine();
+                System.Console.WriteLine($"Please enter the filtering string:{NewLine}");
+                var filter = System.Console.ReadLine();
 
                 try
                 {
@@ -37,14 +37,14 @@ namespace FileObserverTask2
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Something went wrong: {e.Message},{NewLine}please check the provided path");
+                    System.Console.WriteLine($"Something went wrong: {e.Message},{NewLine}please check the provided path");
                 }
 
-                Console.WriteLine($"{NewLine}Search finished:{NewLine}" +
+                System.Console.WriteLine($"{NewLine}Search finished:{NewLine}" +
                                   $"{NewLine}- press enter to repeat search" +
                                   $"{NewLine}- enter \"q\" to quit{NewLine}");
 
-                _exit = Console.ReadLine();
+                _exit = System.Console.ReadLine();
 
             } while (_exit?.ToLower() != "q");
         }

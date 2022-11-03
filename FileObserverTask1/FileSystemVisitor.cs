@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace FileObserverTask1
@@ -11,40 +10,44 @@ namespace FileObserverTask1
         public delegate bool Filter(string value);
         private static Filter _filter;
         private static readonly string NewLine = Environment.NewLine;
+        private readonly IConsole _console;
+        private readonly IFileSystem _fileSystem;
 
-        public FileSystemVisitor(string path)
+        public FileSystemVisitor(IFileSystem fileSystem, IConsole console, string path)
         {
+            _console = console;
             _path = path;
             _filter = null;
+            _fileSystem = fileSystem;
         }
 
-        public FileSystemVisitor(string path, Filter filter)
+        public FileSystemVisitor(IFileSystem fileSystem, IConsole console, string path, Filter filter)
+            : this(fileSystem, console, path)
         {
-            _path = path;
             _filter = filter;
         }
 
         public void Search()
         {
-            Console.WriteLine($"Search in {_path}{NewLine}" +
+            _console.Write($"Search in {_path}{NewLine}" +
                               $"{NewLine}--------- Search Result -----------{NewLine}");
             var count = 0;
 
             foreach (var item in ProcessPath(_path))
             {
-                Console.WriteLine(item);
+                _console.Write(item);
                 count++;
             }
 
             if (count == 0)
-                Console.WriteLine("\t    No results");
+                _console.Write("\t    No results");
 
-            Console.WriteLine($"{NewLine}-------- Search Finished ------------{NewLine}");
+            _console.Write($"{NewLine}-------- Search Finished ------------{NewLine}");
         }
 
-        private static IEnumerable<string> ProcessPath(string directory, string tab = "")
+        private IEnumerable<string> ProcessPath(string directory, string tab = "")
         {
-            foreach (var file in Directory.GetFiles(directory))
+            foreach (var file in _fileSystem.GetFiles(directory))
             {
                 var fileName = GetName(file);
 
@@ -54,7 +57,7 @@ namespace FileObserverTask1
                 }
             }
 
-            foreach (var path in Directory.GetDirectories(directory))
+            foreach (var path in _fileSystem.GetDirectories(directory))
             {
                 if (GetFilteredResult(GetName(path)))
                 {
