@@ -24,7 +24,7 @@ namespace FileObserverTask1
             _filter = filter;
         }
 
-        public void Visit()
+        public void Search()
         {
             Console.WriteLine($"Search in {_path}{NewLine}" +
                               $"{NewLine}--------- Search Result -----------{NewLine}");

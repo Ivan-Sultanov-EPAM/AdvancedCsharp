@@ -25,13 +25,13 @@ namespace FileObserverTask1
                         var visitor = new FileSystemVisitor(string.IsNullOrEmpty(path) ? Path : path,
                             x => x.ToLower().Contains(filter.ToLower()));
 
-                        visitor.Visit();
+                        visitor.Search();
                     }
                     else
                     {
                         var visitor = new FileSystemVisitor(string.IsNullOrEmpty(path) ? Path : path);
 
-                        visitor.Visit();
+                        visitor.Search();
                     }
                 }
                 catch (Exception e)

@@ -26,7 +26,7 @@ namespace FileObserverTask2
             _filter = filter;
         }
 
-        public void Visit()
+        public void Search()
         {
             _publisher.EventHandler += x =>
             {
