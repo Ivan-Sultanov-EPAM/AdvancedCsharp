@@ -10,7 +10,7 @@ namespace FileObserverTask1
         private readonly string _path;
         public delegate bool Filter(string value);
         private static Filter _filter;
-        private static readonly string _newLine = Environment.NewLine;
+        private static readonly string NewLine = Environment.NewLine;
 
         public FileSystemVisitor(string path)
         {
@@ -26,8 +26,8 @@ namespace FileObserverTask1
 
         public void Visit()
         {
-            Console.WriteLine($"Search in {_path}{_newLine}" +
-                              $"{_newLine}--------- Search Result -----------{_newLine}");
+            Console.WriteLine($"Search in {_path}{NewLine}" +
+                              $"{NewLine}--------- Search Result -----------{NewLine}");
             var count = 0;
 
             foreach (var item in ProcessPath(_path))
@@ -37,11 +37,9 @@ namespace FileObserverTask1
             }
 
             if (count == 0)
-            {
                 Console.WriteLine("\t    No results");
-            }
 
-            Console.WriteLine($"{_newLine}-------- Search Finished ------------{_newLine}");
+            Console.WriteLine($"{NewLine}-------- Search Finished ------------{NewLine}");
         }
 
         private static IEnumerable<string> ProcessPath(string directory, string tab = "")

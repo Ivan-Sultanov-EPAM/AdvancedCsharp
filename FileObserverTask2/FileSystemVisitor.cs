@@ -12,6 +12,7 @@ namespace FileObserverTask2
         private static Filter _filter;
         private readonly EventPublisher _publisher = new EventPublisher();
         private bool _stopProcess;
+        private static readonly string NewLine = Environment.NewLine;
 
         public FileSystemVisitor(string path)
         {
@@ -29,16 +30,16 @@ namespace FileObserverTask2
         {
             _publisher.EventHandler += x =>
             {
-                Console.WriteLine($"{Environment.NewLine}*** {x} ***");
+                Console.WriteLine($"{NewLine}{x}{NewLine}");
             };
 
             _publisher.ActionHandler += () =>
             {
                 Console.WriteLine(
-                    $"Proceed: press enter{Environment.NewLine}" +
-                    $"Include: enter 1{Environment.NewLine}" +
-                    $"Exclude: enter 2{Environment.NewLine}" +
-                    $"Stop search: enter 3{Environment.NewLine}"
+                    $"Proceed: press enter{NewLine}" +
+                    $"Include: enter 1{NewLine}" +
+                    $"Exclude: enter 2{NewLine}" +
+                    $"Stop search: enter 3{NewLine}"
                     );
 
                 var result = Console.ReadLine();
@@ -54,7 +55,7 @@ namespace FileObserverTask2
 
             _publisher.SendMessage = "Search has started";
 
-            Console.WriteLine($"Search in {_path}{Environment.NewLine}");
+            Console.WriteLine($"Search in {_path}{NewLine}");
 
             var result = ProcessPath(_path).ToList();
 
@@ -79,7 +80,8 @@ namespace FileObserverTask2
                 var fileName = GetName(file);
 
                 _publisher.SendMessage = GetFilteredResult(fileName) ?
-                    $"File: \"{fileName}\" found and will be included" : $"File: \"{fileName}\"found and will be filtered";
+                    $"File found: \"{fileName}\"{NewLine}and will be included{NewLine}"
+                    : $"File found: \"{fileName}\"{NewLine}and will be filtered{NewLine}";
 
                 var actionResult = _publisher.ActionRequest();
 
@@ -121,7 +123,8 @@ namespace FileObserverTask2
                 var folderName = GetName(path);
 
                 _publisher.SendMessage = GetFilteredResult(folderName) ?
-                    $"File: \"{folderName}\" found and will be included" : $"File: \"{folderName}\"found and will be filtered";
+                    $"Folder found: \"{folderName}\"{NewLine}and will be included{NewLine}"
+                    : $"Folder found: \"{folderName}\"{NewLine}and will be filtered{NewLine}";
 
                 var actionResult = _publisher.ActionRequest();
 
@@ -147,7 +150,7 @@ namespace FileObserverTask2
 
                 if ((GetFilteredResult(folderName) && include) || includeFiltered)
                 {
-                    _publisher.SendMessage = $"Folder: \"{folderName}\" included";
+                    _publisher.SendMessage = $"Folder: \"{folderName}\"{NewLine}included";
                     yield return $"{tab}[{folderName}]";
 
                     foreach (var file in ProcessPath(path, tab + "\t"))
@@ -157,7 +160,7 @@ namespace FileObserverTask2
                 }
                 else
                 {
-                    _publisher.SendMessage = $"Folder: \"{folderName}\" excluded";
+                    _publisher.SendMessage = $"Folder: \"{folderName}\"{NewLine}excluded";
                 }
             }
         }
