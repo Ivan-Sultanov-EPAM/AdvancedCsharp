@@ -1,7 +1,7 @@
 ﻿namespace FileObserverTask2
 {
     public delegate void MessageEventHandler(string value);
-    public delegate bool ActionEventHandler();
+    public delegate ActionsEnum ActionEventHandler();
 
     public class EventPublisher
     {
@@ -18,7 +18,7 @@
             }
         }
 
-        public bool Act()
+        public ActionsEnum ActionRequest()
         {
             return ActionHandler();
         }

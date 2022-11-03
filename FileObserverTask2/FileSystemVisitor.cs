@@ -9,14 +9,14 @@ namespace FileObserverTask2
     {
         private readonly string _path;
         public delegate bool Filter(string value);
-        private readonly Filter _filter;
+        private static Filter _filter;
         private readonly EventPublisher _publisher = new EventPublisher();
         private bool _stopProcess;
-        private bool _skipResult;
 
         public FileSystemVisitor(string path)
         {
             _path = path;
+            _filter = null;
         }
 
         public FileSystemVisitor(string path, Filter filter)
@@ -34,14 +34,22 @@ namespace FileObserverTask2
 
             _publisher.ActionHandler += () =>
             {
-                Console.WriteLine("To proceed: 1");
-                var reply = Console.ReadLine();
-                if (reply == "1")
-                {
-                    return false;
-                }
+                Console.WriteLine(
+                    $"Proceed: press enter{Environment.NewLine}" +
+                    $"Include: enter 1{Environment.NewLine}" +
+                    $"Exclude: enter 2{Environment.NewLine}" +
+                    $"Stop search: enter 3{Environment.NewLine}"
+                    );
 
-                return true;
+                var result = Console.ReadLine();
+
+                return result switch
+                {
+                    "1" => ActionsEnum.Include,
+                    "2" => ActionsEnum.Exclude,
+                    "3" => ActionsEnum.StopSearch,
+                    _ => ActionsEnum.Proceed,
+                };
             };
 
             _publisher.SendMessage = "Search has started";
@@ -52,29 +60,52 @@ namespace FileObserverTask2
 
             _publisher.SendMessage = "--------- Search Result ------------";
 
-            foreach (var item in result)
+            result.ForEach(item => Console.WriteLine(item));
+
+            if (result.Count == 0)
             {
-                Console.WriteLine(item);
+                Console.WriteLine("\t    No results");
             }
 
-            _publisher.SendMessage = "--------- Search Finished ------------";
+            _publisher.SendMessage = "-------- Search Finished -----------";
         }
 
-        IEnumerable<string> ProcessPath(string directory, string tab = "")
+        private IEnumerable<string> ProcessPath(string directory, string tab = "")
         {
             foreach (var file in Directory.GetFiles(directory))
             {
                 if (_stopProcess) break;
 
                 var fileName = GetName(file);
-                _publisher.SendMessage = $"File: \"{fileName}\" Found";
 
-                _stopProcess = _publisher.Act();
+                _publisher.SendMessage = GetFilteredResult(fileName) ?
+                    $"File: \"{fileName}\" found and will be included" : $"File: \"{fileName}\"found and will be filtered";
+
+                var actionResult = _publisher.ActionRequest();
+
+                var include = true;
+                var includeFiltered = false;
+
+                switch (actionResult)
+                {
+                    case ActionsEnum.Include:
+                        includeFiltered = true;
+                        break;
+                    case ActionsEnum.Exclude:
+                        include = false;
+                        break;
+                    case ActionsEnum.StopSearch:
+                        _stopProcess = true;
+                        break;
+                    case ActionsEnum.Proceed:
+                        break;
+                }
+
                 if (_stopProcess) break;
 
-                if (GetFilteredResult(fileName))
+                if ((GetFilteredResult(fileName) && include) || includeFiltered)
                 {
-                    _publisher.SendMessage = $"File: \"{fileName}\" Included";
+                    _publisher.SendMessage = $"File: \"{fileName}\" included";
                     yield return $"{tab}{fileName}";
                 }
                 else
@@ -87,43 +118,58 @@ namespace FileObserverTask2
             {
                 if (_stopProcess) break;
 
-                var folder = GetName(path);
-                _publisher.SendMessage = $"Folder: \"{folder}\" Found";
+                var folderName = GetName(path);
 
-                _stopProcess = _publisher.Act();
+                _publisher.SendMessage = GetFilteredResult(folderName) ?
+                    $"File: \"{folderName}\" found and will be included" : $"File: \"{folderName}\"found and will be filtered";
+
+                var actionResult = _publisher.ActionRequest();
+
+                var include = true;
+                var includeFiltered = false;
+
+                switch (actionResult)
+                {
+                    case ActionsEnum.Include:
+                        includeFiltered = true;
+                        break;
+                    case ActionsEnum.Exclude:
+                        include = false;
+                        break;
+                    case ActionsEnum.StopSearch:
+                        _stopProcess = true;
+                        break;
+                    case ActionsEnum.Proceed:
+                        break;
+                }
+
                 if (_stopProcess) break;
 
-                if (GetFilteredResult(folder))
+                if ((GetFilteredResult(folderName) && include) || includeFiltered)
                 {
-                    _publisher.SendMessage = $"Folder: \"{folder}\" Included";
-                    yield return $"{tab}{folder}";
+                    _publisher.SendMessage = $"Folder: \"{folderName}\" included";
+                    yield return $"{tab}[{folderName}]";
+
+                    foreach (var file in ProcessPath(path, tab + "\t"))
+                    {
+                        yield return file;
+                    }
                 }
                 else
                 {
-                    _publisher.SendMessage = $"Folder: \"{folder}\" excluded";
-                }
-
-                foreach (var file in ProcessPath(path, tab + "\t"))
-                {
-                    yield return file;
+                    _publisher.SendMessage = $"Folder: \"{folderName}\" excluded";
                 }
             }
         }
 
-        string GetName(string path)
+        private static string GetName(string path)
         {
-            var splitPath = path.Split("\\");
-            return splitPath.Last();
+            return path.Split("\\").Last();
         }
 
-        bool GetFilteredResult(string value)
+        private static bool GetFilteredResult(string value)
         {
-            if (_filter != null && _filter(value))
-                return true;
-
-            if (_filter == null) return true;
-
-            return false;
+            return (_filter != null && _filter(value)) || _filter == null;
         }
     }
 }

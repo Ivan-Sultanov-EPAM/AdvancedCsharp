@@ -27,14 +27,21 @@ namespace FileObserverTask1
         public void Visit()
         {
             Console.WriteLine($"Search in {_path}{_newLine}" +
-                              $"{_newLine}--------- Search Result ------------{_newLine}");
+                              $"{_newLine}--------- Search Result -----------{_newLine}");
+            var count = 0;
 
             foreach (var item in ProcessPath(_path))
             {
                 Console.WriteLine(item);
+                count++;
             }
 
-            Console.WriteLine($"{_newLine}--------- Search Finished ------------{_newLine}");
+            if (count == 0)
+            {
+                Console.WriteLine("\t    No results");
+            }
+
+            Console.WriteLine($"{_newLine}-------- Search Finished ------------{_newLine}");
         }
 
         private static IEnumerable<string> ProcessPath(string directory, string tab = "")
@@ -54,11 +61,11 @@ namespace FileObserverTask1
                 if (GetFilteredResult(GetName(path)))
                 {
                     yield return $"{tab}[{GetName(path)}]";
-                }
 
-                foreach (var file in ProcessPath(path, tab + "\t"))
-                {
-                    yield return file;
+                    foreach (var file in ProcessPath(path, tab + "\t"))
+                    {
+                        yield return file;
+                    }
                 }
             }
         }
