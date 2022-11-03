@@ -11,6 +11,8 @@ namespace FileObserverTask2
         public delegate bool Filter(string value);
         private readonly Filter _filter;
         private readonly EventPublisher _publisher = new EventPublisher();
+        private bool _stopProcess;
+        private bool _skipResult;
 
         public FileSystemVisitor(string path)
         {
@@ -28,6 +30,18 @@ namespace FileObserverTask2
             _publisher.EventHandler += x =>
             {
                 Console.WriteLine($"{Environment.NewLine}*** {x} ***");
+            };
+
+            _publisher.ActionHandler += () =>
+            {
+                Console.WriteLine("To proceed: 1");
+                var reply = Console.ReadLine();
+                if (reply == "1")
+                {
+                    return false;
+                }
+
+                return true;
             };
 
             _publisher.SendMessage = "Search has started";
@@ -50,8 +64,13 @@ namespace FileObserverTask2
         {
             foreach (var file in Directory.GetFiles(directory))
             {
+                if (_stopProcess) break;
+
                 var fileName = GetName(file);
                 _publisher.SendMessage = $"File: \"{fileName}\" Found";
+
+                _stopProcess = _publisher.Act();
+                if (_stopProcess) break;
 
                 if (GetFilteredResult(fileName))
                 {
@@ -66,8 +85,13 @@ namespace FileObserverTask2
 
             foreach (var path in Directory.GetDirectories(directory))
             {
+                if (_stopProcess) break;
+
                 var folder = GetName(path);
                 _publisher.SendMessage = $"Folder: \"{folder}\" Found";
+
+                _stopProcess = _publisher.Act();
+                if (_stopProcess) break;
 
                 if (GetFilteredResult(folder))
                 {

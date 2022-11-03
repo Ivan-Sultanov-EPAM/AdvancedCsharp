@@ -6,15 +6,16 @@ namespace FileObserverTask1
     {
         private const string Path = "C:\\Users\\Ivan\\Downloads\\TestFolder";
         private static string _exit;
+        private static readonly string _newLine = Environment.NewLine;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             do
             {
-                Console.WriteLine($"Please enter the path:{Environment.NewLine}");
+                Console.WriteLine($"Please enter the path:{_newLine}");
                 var path = Console.ReadLine();
 
-                Console.WriteLine($"Please enter the filtering string:{Environment.NewLine}");
+                Console.WriteLine($"Please enter the filtering string:{_newLine}");
                 var filter = Console.ReadLine();
 
                 try
@@ -35,11 +36,11 @@ namespace FileObserverTask1
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Something went wrong: {e.Message},{Environment.NewLine}please check the provided path");
+                    Console.WriteLine($"Something went wrong: {e.Message},{_newLine}please check the provided path");
                 }
 
-                Console.WriteLine($"Search finished, press enter to repeat{Environment.NewLine}" +
-                                  $"or type \"exit\" and press enter to quit{Environment.NewLine}");
+                Console.WriteLine($"{_newLine}- press enter to repeat" +
+                                  $"{_newLine}- enter \"exit\" to quit{_newLine}");
 
                 _exit = Console.ReadLine();
 

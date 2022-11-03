@@ -9,11 +9,13 @@ namespace FileObserverTask1
     {
         private readonly string _path;
         public delegate bool Filter(string value);
-        private readonly Filter _filter;
+        private static Filter _filter;
+        private static readonly string _newLine = Environment.NewLine;
 
         public FileSystemVisitor(string path)
         {
             _path = path;
+            _filter = null;
         }
 
         public FileSystemVisitor(string path, Filter filter)
@@ -24,15 +26,18 @@ namespace FileObserverTask1
 
         public void Visit()
         {
-            Console.WriteLine($"Search in {_path}{Environment.NewLine}");
+            Console.WriteLine($"Search in {_path}{_newLine}" +
+                              $"{_newLine}--------- Search Result ------------{_newLine}");
 
             foreach (var item in ProcessPath(_path))
             {
                 Console.WriteLine(item);
             }
+
+            Console.WriteLine($"{_newLine}--------- Search Finished ------------{_newLine}");
         }
 
-        IEnumerable<string> ProcessPath(string directory, string tab = "")
+        private static IEnumerable<string> ProcessPath(string directory, string tab = "")
         {
             foreach (var file in Directory.GetFiles(directory))
             {
@@ -48,7 +53,7 @@ namespace FileObserverTask1
             {
                 if (GetFilteredResult(GetName(path)))
                 {
-                    yield return $"{tab}{GetName(path)}";
+                    yield return $"{tab}[{GetName(path)}]";
                 }
 
                 foreach (var file in ProcessPath(path, tab + "\t"))
@@ -58,20 +63,14 @@ namespace FileObserverTask1
             }
         }
 
-        string GetName(string path)
+        private static string GetName(string path)
         {
-            var splitPath = path.Split("\\");
-            return splitPath.Last();
+            return path.Split("\\").Last();
         }
 
-        bool GetFilteredResult(string value)
+        private static bool GetFilteredResult(string value)
         {
-            if (_filter != null && _filter(value))
-                return true;
-
-            if (_filter == null) return true;
-
-            return false;
+            return (_filter != null && _filter(value)) || _filter == null;
         }
     }
 }
