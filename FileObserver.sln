@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileObserverTask1", "FileObserverTask1\FileObserverTask1.csproj", "{6C3E29D1-C318-427D-9CD0-3185D7E2D796}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileObserverTask2", "FileObserverTask2\FileObserverTask2.csproj", "{EEA42B6C-5AD3-4998-9365-B67A4049DE31}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6C3E29D1-C318-427D-9CD0-3185D7E2D796}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C3E29D1-C318-427D-9CD0-3185D7E2D796}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C3E29D1-C318-427D-9CD0-3185D7E2D796}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEA42B6C-5AD3-4998-9365-B67A4049DE31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEA42B6C-5AD3-4998-9365-B67A4049DE31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEA42B6C-5AD3-4998-9365-B67A4049DE31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEA42B6C-5AD3-4998-9365-B67A4049DE31}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

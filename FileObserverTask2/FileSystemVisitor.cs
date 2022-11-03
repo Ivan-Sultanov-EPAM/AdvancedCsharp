@@ -10,7 +10,7 @@ namespace FileObserverTask2
         private readonly string _path;
         public delegate bool Filter(string value);
         private readonly Filter _filter;
-        public EventPublisher _publisher = new EventPublisher();
+        private readonly EventPublisher _publisher = new EventPublisher();
 
         public FileSystemVisitor(string path)
         {

@@ -1,11 +1,11 @@
 ﻿namespace FileObserverTask2
 {
-    public delegate void EventHandler(string value);
+    public delegate void MessageEventHandler(string value);
 
     public class EventPublisher
     {
         private string _value;
-        public event EventHandler EventHandler;
+        public event MessageEventHandler EventHandler;
 
         public string SendMessage
         {
