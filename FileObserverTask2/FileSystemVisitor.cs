@@ -20,9 +20,8 @@ namespace FileObserverTask2
             _filter = null;
         }
 
-        public FileSystemVisitor(string path, Filter filter)
+        public FileSystemVisitor(string path, Filter filter) : this(path)
         {
-            _path = path;
             _filter = filter;
         }
 
