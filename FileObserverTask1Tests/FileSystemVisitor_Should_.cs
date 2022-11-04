@@ -10,17 +10,17 @@ namespace FileObserverTask1Tests
         private readonly Mock<IConsole> _consoleMock;
         private readonly Mock<IFileSystem> _fileSystemMock;
         private FileSystemVisitor _fileSystemVisitor;
-        private static readonly string Path = "Path";
+        private const string Path = "Path";
         private static readonly string NewLine = Environment.NewLine;
         private static readonly string SearchResult = $"Search in {Path}{NewLine}{NewLine}--------- Search Result -----------{NewLine}";
         private static readonly string SearchFinished = $"{NewLine}-------- Search Finished ------------{NewLine}";
-        string[] files = new[] { "file1", "file2", "file3" };
+        private readonly string[] _files = new[] { "file1", "file2", "file3" };
 
         public FileSystemVisitor_Should_()
         {
             _consoleMock = new Mock<IConsole>();
             _fileSystemMock = new Mock<IFileSystem>();
-            _fileSystemMock.Setup(f => f.GetFiles(It.IsAny<String>())).Returns(files);
+            _fileSystemMock.Setup(f => f.GetFiles(It.IsAny<String>())).Returns(_files);
         }
 
         [Fact]
