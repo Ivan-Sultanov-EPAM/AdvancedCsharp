@@ -10,9 +10,9 @@ namespace FileObserverTask1Tests
         private readonly Mock<IConsole> _consoleMock;
         private readonly Mock<IFileSystem> _fileSystemMock;
         private FileSystemVisitor _fileSystemVisitor;
-        private static readonly string _path = "Path";
+        private static readonly string Path = "Path";
         private static readonly string NewLine = Environment.NewLine;
-        private static readonly string SearchResult = $"Search in {_path}{NewLine}{NewLine}--------- Search Result -----------{NewLine}";
+        private static readonly string SearchResult = $"Search in {Path}{NewLine}{NewLine}--------- Search Result -----------{NewLine}";
         private static readonly string SearchFinished = $"{NewLine}-------- Search Finished ------------{NewLine}";
         string[] files = new[] { "file1", "file2", "file3" };
 
@@ -26,7 +26,7 @@ namespace FileObserverTask1Tests
         [Fact]
         public void Show_All_Files()
         {
-            _fileSystemVisitor = new FileSystemVisitor(_fileSystemMock.Object, _consoleMock.Object, _path);
+            _fileSystemVisitor = new FileSystemVisitor(_fileSystemMock.Object, _consoleMock.Object, Path);
             _fileSystemVisitor.Search();
 
             _consoleMock.Verify(c => c.Write(It.Is<String>(s => s == SearchResult)), Times.Once());
@@ -39,7 +39,7 @@ namespace FileObserverTask1Tests
         [Fact]
         public void Filter_Files()
         {
-            _fileSystemVisitor = new FileSystemVisitor(_fileSystemMock.Object, _consoleMock.Object, _path,
+            _fileSystemVisitor = new FileSystemVisitor(_fileSystemMock.Object, _consoleMock.Object, Path,
                 x => x.Contains("file2"));
 
             _fileSystemVisitor.Search();
@@ -54,7 +54,7 @@ namespace FileObserverTask1Tests
         [Fact]
         public void Show_No_Results_If_Files_Not_Found()
         {
-            _fileSystemVisitor = new FileSystemVisitor(_fileSystemMock.Object, _consoleMock.Object, _path,
+            _fileSystemVisitor = new FileSystemVisitor(_fileSystemMock.Object, _consoleMock.Object, Path,
                 x => x.Contains("NotExist"));
 
             _fileSystemVisitor.Search();
@@ -76,7 +76,7 @@ namespace FileObserverTask1Tests
 
             _fileSystemMock.Setup(f => f.GetFiles(It.IsAny<String>())).Returns(new string[] { });
 
-            _fileSystemVisitor = new FileSystemVisitor(_fileSystemMock.Object, _consoleMock.Object, _path);
+            _fileSystemVisitor = new FileSystemVisitor(_fileSystemMock.Object, _consoleMock.Object, Path);
 
             _fileSystemVisitor.Search();
 
