@@ -156,15 +156,12 @@ namespace FileObserverTask2
 
         private ActionsEnum ActionRequest()
         {
-            return ActionHandler != null ? ActionHandler() : ActionsEnum.Proceed;
+            return ActionHandler?.Invoke() ?? ActionsEnum.Proceed;
         }
 
         private void SendMessage(string value)
         {
-            if (EventHandler != null)
-            {
-                EventHandler(value);
-            }
+            EventHandler?.Invoke(value);
         }
     }
 }
