@@ -5,14 +5,17 @@ using System.Linq;
 
 namespace FileObserverTask2
 {
-    public class FileSystemVisitor
+    internal class FileSystemVisitor
     {
         private readonly string _path;
         public delegate bool Filter(string value);
         private static Filter _filter;
-        private readonly EventPublisher _publisher = new EventPublisher();
         private bool _stopProcess;
         private static readonly string NewLine = Environment.NewLine;
+        public delegate void MessageEventHandler(string value);
+        public delegate ActionsEnum ActionEventHandler();
+        public event MessageEventHandler EventHandler;
+        public event ActionEventHandler ActionHandler;
 
         public FileSystemVisitor(string path)
         {
@@ -27,47 +30,20 @@ namespace FileObserverTask2
 
         public void Search()
         {
-            _publisher.EventHandler += x =>
-            {
-                Console.WriteLine($"{NewLine}{x}{NewLine}");
-            };
-
-            _publisher.ActionHandler += () =>
-            {
-                Console.WriteLine(
-                    $"Proceed: press enter{NewLine}" +
-                    $"Include: enter 1{NewLine}" +
-                    $"Exclude: enter 2{NewLine}" +
-                    $"Stop search: enter 3{NewLine}"
-                    );
-
-                var result = Console.ReadLine();
-
-                return result switch
-                {
-                    "1" => ActionsEnum.Include,
-                    "2" => ActionsEnum.Exclude,
-                    "3" => ActionsEnum.StopSearch,
-                    _ => ActionsEnum.Proceed,
-                };
-            };
-
-            _publisher.SendMessage = "Search has started";
-
-            Console.WriteLine($"Search in {_path}{NewLine}");
+            SendMessage($"Search has started in {_path}{NewLine}");
 
             var result = ProcessPath(_path).ToList();
 
-            _publisher.SendMessage = "--------- Search Result ------------";
+            SendMessage($"{NewLine}--------- Search Result ------------{NewLine}");
 
-            result.ForEach(item => Console.WriteLine(item));
+            result.ForEach(item => SendMessage(item));
 
             if (result.Count == 0)
             {
-                Console.WriteLine("\t    No results");
+                SendMessage($"\t    No results{NewLine}");
             }
 
-            _publisher.SendMessage = "-------- Search Finished -----------";
+            SendMessage($"{NewLine}-------- Search Finished -----------");
         }
 
         private IEnumerable<string> ProcessPath(string directory, string tab = "")
@@ -78,11 +54,13 @@ namespace FileObserverTask2
 
                 var fileName = GetName(file);
 
-                _publisher.SendMessage = GetFilteredResult(fileName) ?
+                var message = GetFilteredResult(fileName) ?
                     $"File found: \"{fileName}\"{NewLine}and will be included{NewLine}"
                     : $"File found: \"{fileName}\"{NewLine}and will be filtered{NewLine}";
 
-                var actionResult = _publisher.ActionRequest();
+                SendMessage(message);
+
+                var actionResult = ActionRequest();
 
                 var include = true;
                 var includeFiltered = false;
@@ -106,12 +84,12 @@ namespace FileObserverTask2
 
                 if ((GetFilteredResult(fileName) && include) || includeFiltered)
                 {
-                    _publisher.SendMessage = $"File: \"{fileName}\" included";
+                    SendMessage($"File: \"{fileName}\"{NewLine}included{NewLine}");
                     yield return $"{tab}{fileName}";
                 }
                 else
                 {
-                    _publisher.SendMessage = $"File: \"{fileName}\" excluded";
+                    SendMessage($"File: \"{fileName}\"{NewLine}excluded{NewLine}");
                 }
             }
 
@@ -121,11 +99,13 @@ namespace FileObserverTask2
 
                 var folderName = GetName(path);
 
-                _publisher.SendMessage = GetFilteredResult(folderName) ?
+                var message = GetFilteredResult(folderName) ?
                     $"Folder found: \"{folderName}\"{NewLine}and will be included{NewLine}"
                     : $"Folder found: \"{folderName}\"{NewLine}and will be filtered{NewLine}";
 
-                var actionResult = _publisher.ActionRequest();
+                SendMessage(message);
+
+                var actionResult = ActionRequest();
 
                 var include = true;
                 var includeFiltered = false;
@@ -149,7 +129,7 @@ namespace FileObserverTask2
 
                 if ((GetFilteredResult(folderName) && include) || includeFiltered)
                 {
-                    _publisher.SendMessage = $"Folder: \"{folderName}\"{NewLine}included";
+                    SendMessage($"Folder: \"{folderName}\"{NewLine}included{NewLine}");
                     yield return $"{tab}[{folderName}]";
 
                     foreach (var file in ProcessPath(path, tab + "\t"))
@@ -159,7 +139,7 @@ namespace FileObserverTask2
                 }
                 else
                 {
-                    _publisher.SendMessage = $"Folder: \"{folderName}\"{NewLine}excluded";
+                    SendMessage($"Folder: \"{folderName}\"{NewLine}excluded{NewLine}");
                 }
             }
         }
@@ -172,6 +152,19 @@ namespace FileObserverTask2
         private static bool GetFilteredResult(string value)
         {
             return (_filter != null && _filter(value)) || _filter == null;
+        }
+
+        private ActionsEnum ActionRequest()
+        {
+            return ActionHandler != null ? ActionHandler() : ActionsEnum.Proceed;
+        }
+
+        private void SendMessage(string value)
+        {
+            if (EventHandler != null)
+            {
+                EventHandler(value);
+            }
         }
     }
 }
